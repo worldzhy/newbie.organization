@@ -1,0 +1,42 @@
+// ! ------------------------------------------------------------ //
+// !             [Microservice] Organization models               //
+// ! ------------------------------------------------------------ //
+// * Organization                                                 //
+// * OrgMembership                                                //
+// * ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄  //
+
+model Organization {
+  id                String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String
+  autoJoinDomain    Boolean    @default(false)
+  forceTwoFactor    Boolean    @default(false)
+  ipRestrictions    String?
+  onlyAllowDomain   Boolean    @default(false)
+  profilePictureUrl String?
+  attributes        Json?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  memberships       OrgMembership[]
+
+  @@schema("microservice/organization")
+}
+
+model OrgMembership {
+  id             Int            @id @default(autoincrement())
+  role           MembershipRole @default(MEMBER)
+  userId         String         @db.Uuid
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  organizationId String         @db.Uuid
+
+  @@schema("microservice/organization")
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+
+  @@schema("microservice/organization")
+}
