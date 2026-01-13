@@ -1,12 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import {BadRequestException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {OrgMembership} from '@prisma/client';
-import {MembershipRole, Prisma} from '@prisma/client';
+import {OrgMembership} from '@generated/prisma/client';
+import {MembershipRole, Prisma} from '@generated/prisma/client';
 import {
   CANNOT_DELETE_SOLE_MEMBER,
   CANNOT_DELETE_SOLE_OWNER,
@@ -27,12 +22,7 @@ export class MembershipService {
     private authService: AuthService
   ) {}
 
-  async create(params: {
-    organizationId: string;
-    ipAddress: string;
-    email: string;
-    role?: MembershipRole;
-  }) {
+  async create(params: {organizationId: string; ipAddress: string; email: string; role?: MembershipRole}) {
     const {organizationId, ipAddress, email, role} = params;
 
     // Register user
@@ -63,9 +53,7 @@ export class MembershipService {
       template: {
         'organizations/invitation': {
           organizationName: membership.organization.name,
-          link: `${this.config.get<string>(
-            'framework.app.frontendUrl'
-          )}/organization/${params.organizationId}`,
+          link: `${this.config.get<string>('framework.app.frontendUrl')}/organization/${params.organizationId}`,
         },
       },
     });
@@ -78,26 +66,17 @@ export class MembershipService {
       where: {id},
     });
     if (!membership) throw new NotFoundException(MEMBERSHIP_NOT_FOUND);
-    if (membership.organizationId !== organizationId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (membership.organizationId !== organizationId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     return membership;
   }
 
-  async update(
-    organizationId: string,
-    id: number,
-    data: Prisma.OrgMembershipUpdateInput
-  ): Promise<OrgMembership> {
+  async update(organizationId: string, id: number, data: Prisma.OrgMembershipUpdateInput): Promise<OrgMembership> {
     const testMembership = await this.prisma.orgMembership.findUnique({
       where: {id},
     });
     if (!testMembership) throw new NotFoundException(MEMBERSHIP_NOT_FOUND);
-    if (testMembership.organizationId !== organizationId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
-    if (
-      testMembership.role === MembershipRole.OWNER &&
-      data.role !== MembershipRole.OWNER
-    ) {
+    if (testMembership.organizationId !== organizationId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (testMembership.role === MembershipRole.OWNER && data.role !== MembershipRole.OWNER) {
       const otherOwners = (
         await this.prisma.orgMembership.findMany({
           where: {
@@ -106,8 +85,7 @@ export class MembershipService {
           },
         })
       ).filter(i => i.id !== id);
-      if (!otherOwners.length)
-        throw new BadRequestException(CANNOT_UPDATE_ROLE_SOLE_OWNER);
+      if (!otherOwners.length) throw new BadRequestException(CANNOT_UPDATE_ROLE_SOLE_OWNER);
     }
 
     return await this.prisma.orgMembership.update({
@@ -121,8 +99,7 @@ export class MembershipService {
       where: {id},
     });
     if (!testMembership) throw new NotFoundException(MEMBERSHIP_NOT_FOUND);
-    if (testMembership.organizationId !== organizationId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (testMembership.organizationId !== organizationId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     await this.verifyDeleteMembership(testMembership.organizationId, id);
 
     return await this.prisma.orgMembership.delete({
@@ -131,23 +108,16 @@ export class MembershipService {
   }
 
   /** Verify whether a organization membership can be deleted */
-  private async verifyDeleteMembership(
-    organizationId: string,
-    membershipId: number
-  ): Promise<void> {
+  private async verifyDeleteMembership(organizationId: string, membershipId: number): Promise<void> {
     const memberships = await this.prisma.orgMembership.findMany({
       where: {organization: {id: organizationId}},
     });
-    if (memberships.length === 1)
-      throw new BadRequestException(CANNOT_DELETE_SOLE_MEMBER);
+    if (memberships.length === 1) throw new BadRequestException(CANNOT_DELETE_SOLE_MEMBER);
     const membership = await this.prisma.orgMembership.findUnique({
       where: {id: membershipId},
     });
     if (!membership) throw new NotFoundException(MEMBERSHIP_NOT_FOUND);
-    if (
-      membership.role === 'OWNER' &&
-      memberships.filter(i => i.role === 'OWNER').length === 1
-    )
+    if (membership.role === 'OWNER' && memberships.filter(i => i.role === 'OWNER').length === 1)
       throw new BadRequestException(CANNOT_DELETE_SOLE_OWNER);
   }
 }

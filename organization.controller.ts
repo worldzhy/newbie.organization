@@ -1,15 +1,6 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  Body,
-  Param,
-  Query,
-} from '@nestjs/common';
+import {Controller, Delete, Get, Patch, Post, Body, Param, Query} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
-import {Organization, PermissionAction, Prisma} from '@prisma/client';
+import {Organization, PermissionAction, Prisma} from '@generated/prisma/client';
 import {RequirePermission} from '@microservices/account/security/authorization/authorization.decorator';
 import {PrismaService} from '@framework/prisma/prisma.service';
 
@@ -32,9 +23,7 @@ export class OrganizationController {
       },
     },
   })
-  async createOrganization(
-    @Body() body: Prisma.OrganizationCreateInput
-  ): Promise<Organization> {
+  async createOrganization(@Body() body: Prisma.OrganizationCreateInput): Promise<Organization> {
     return await this.prisma.organization.create({
       data: body,
     });
@@ -75,9 +64,7 @@ export class OrganizationController {
 
   @Get(':organizationId')
   @RequirePermission(PermissionAction.Get, Prisma.ModelName.Organization)
-  async getOrganization(
-    @Param('organizationId') organizationId: string
-  ): Promise<Organization> {
+  async getOrganization(@Param('organizationId') organizationId: string): Promise<Organization> {
     return await this.prisma.organization.findUniqueOrThrow({
       where: {id: organizationId},
     });
@@ -109,9 +96,7 @@ export class OrganizationController {
 
   @Delete(':organizationId')
   @RequirePermission(PermissionAction.Delete, Prisma.ModelName.Organization)
-  async deleteOrganization(
-    @Param('organizationId') organizationId: string
-  ): Promise<Organization> {
+  async deleteOrganization(@Param('organizationId') organizationId: string): Promise<Organization> {
     return await this.prisma.organization.delete({
       where: {id: organizationId},
     });

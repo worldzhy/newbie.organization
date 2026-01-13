@@ -1,16 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Ip,
-  Param,
-  ParseIntPipe,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
-import {OrgMembership, Prisma} from '@prisma/client';
+import {Body, Controller, Delete, Get, Ip, Param, ParseIntPipe, Patch, Post, Query} from '@nestjs/common';
+import {OrgMembership, Prisma} from '@generated/prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {ApiBearerAuth, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {
@@ -46,10 +35,7 @@ export class MembershipController {
     type: ListMembershipsResponseDto,
     description: 'List of memberships for the organization',
   })
-  async getAll(
-    @Param('organizationId') organizationId: string,
-    @Query() query: ListMembershipsRequestDto
-  ) {
+  async getAll(@Param('organizationId') organizationId: string, @Query() query: ListMembershipsRequestDto) {
     const {page, pageSize} = query;
     return await this.prisma.findManyInManyPages({
       model: Prisma.ModelName.OrgMembership,
