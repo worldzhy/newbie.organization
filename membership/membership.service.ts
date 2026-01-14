@@ -1,6 +1,6 @@
 import {BadRequestException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {MembershipRole, OrgMembership, Prisma} from '@generated/prisma/client';
+import {OrgMembership, MembershipRole, Prisma} from '@generated/prisma/client';
 import {
   CANNOT_DELETE_SOLE_MEMBER,
   CANNOT_DELETE_SOLE_OWNER,

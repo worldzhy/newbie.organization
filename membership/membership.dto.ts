@@ -1,5 +1,5 @@
 import {IsEmail, IsIn, IsNotEmpty, IsOptional, IsString} from 'class-validator';
-import {MembershipRole, OrgMembership} from '@generated/prisma/client';
+import {OrgMembership, MembershipRole} from '@generated/prisma/client';
 import {CommonListRequestDto, CommonListResponseDto} from '@framework/common.dto';
 import {ApiProperty} from '@nestjs/swagger';
 
