@@ -1,7 +1,7 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
-import type {Prisma} from '@prisma/client';
-import {Organization} from '@prisma/client';
-import * as randomColor from 'randomcolor';
+import type {Prisma} from '@generated/prisma/client';
+import {Organization} from '@generated/prisma/client';
+import randomColor from 'randomcolor';
 import {GROUP_NOT_FOUND} from '@framework/exceptions/errors.constants';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {Expose, expose} from '@microservices/account/helpers/expose';
@@ -76,10 +76,7 @@ export class OrganizationService {
     return expose<Organization>(organization);
   }
 
-  async updateOrganization(
-    id: string,
-    data: Prisma.OrganizationUpdateInput
-  ): Promise<Expose<Organization>> {
+  async updateOrganization(id: string, data: Prisma.OrganizationUpdateInput): Promise<Expose<Organization>> {
     const testOrganization = await this.prisma.organization.findUnique({
       where: {id},
     });
@@ -91,10 +88,7 @@ export class OrganizationService {
     return expose<Organization>(organization);
   }
 
-  async replaceOrganization(
-    id: string,
-    data: Prisma.OrganizationCreateInput
-  ): Promise<Expose<Organization>> {
+  async replaceOrganization(id: string, data: Prisma.OrganizationCreateInput): Promise<Expose<Organization>> {
     const testOrganization = await this.prisma.organization.findUnique({
       where: {id},
     });

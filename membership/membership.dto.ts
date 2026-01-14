@@ -1,9 +1,6 @@
 import {IsEmail, IsIn, IsNotEmpty, IsOptional, IsString} from 'class-validator';
-import {Membership, MembershipRole} from '@prisma/client';
-import {
-  CommonListRequestDto,
-  CommonListResponseDto,
-} from '@framework/common.dto';
+import {MembershipRole, OrgMembership} from '@generated/prisma/client';
+import {CommonListRequestDto, CommonListResponseDto} from '@framework/common.dto';
 import {ApiProperty} from '@nestjs/swagger';
 
 export class ListMembershipsRequestDto extends CommonListRequestDto {}
@@ -13,7 +10,7 @@ export class ListMembershipsResponseDto extends CommonListResponseDto {
     type: Object,
     isArray: true,
   })
-  declare records: Membership[];
+  declare records: OrgMembership[];
 }
 
 export class UpdateMembershipDto {
